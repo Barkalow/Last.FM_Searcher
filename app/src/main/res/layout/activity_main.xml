@@ -1,0 +1,98 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true" >
+
+    <EditText
+        android:id="@+id/bandTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:ems="10" >
+
+
+    </EditText>
+
+    <RadioGroup
+        android:id="@+id/choices"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/bandTxt"
+        android:layout_below="@+id/bandTxt"
+        android:layout_marginTop="14dp" >
+
+        <RadioButton
+            android:id="@+id/topSongs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Top Songs" />
+
+        <RadioButton
+            android:id="@+id/topAlbums"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Top Albums" />
+
+        <RadioButton
+            android:id="@+id/similarArtists"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Similar Artists" />
+    </RadioGroup>
+
+<Button
+    android:id="@+id/tracksBtn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentLeft="true"
+    android:text="Tracks" />
+
+<Button
+    android:id="@+id/artistsBtn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/tracksBtn"
+    android:layout_alignBottom="@+id/tracksBtn"
+    android:layout_alignRight="@+id/bandTxt"
+    android:text="Artists" />
+
+<Button
+    android:id="@+id/searchBtn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/choices"
+    android:layout_centerHorizontal="true"
+    android:text="Go!" />
+
+<ListView
+    android:id="@+id/topListView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/tracksBtn"
+    android:layout_alignLeft="@+id/choices"
+    android:layout_alignRight="@+id/artistsBtn"
+    android:layout_below="@+id/searchBtn" >
+
+</ListView>
+
+<TextView
+    android:id="@+id/textView1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/tracksBtn"
+    android:layout_alignBottom="@+id/tracksBtn"
+    android:layout_centerHorizontal="true"
+    android:text="&lt; Top Charts >" />
+
+</RelativeLayout>
