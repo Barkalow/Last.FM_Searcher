@@ -54,7 +54,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	ArrayAdapter<Item> artistAdapter;
 	ArrayList<Item> result;
 
-	final String M_KEY = "b534d686e54b14b459a08e9ea83b0220";
+	final String M_KEY = "xxxxxxxxxxxxxxxxxx"; //redacted, because private
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
