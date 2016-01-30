@@ -1,6 +1,8 @@
 package edu.apsu.csci4020.finalproject;
 /**
  * Created by ACOFF on 11/27/2015.
+ *
+ * XML parser for the information returned by the Last.FM API. Essentially checks XML flags and grabs the needed data from them.
  */
 
 import org.xml.sax.Attributes;

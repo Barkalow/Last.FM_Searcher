@@ -2,6 +2,8 @@ package edu.apsu.csci4020.finalproject;
 
 /**
  * Created by ACOFF on 11/27/2015.
+ *
+ * Object to hold the returned data from the API calls
  */
 public class Item {
     private String title;

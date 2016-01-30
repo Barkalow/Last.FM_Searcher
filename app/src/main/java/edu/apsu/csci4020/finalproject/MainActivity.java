@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import org.xml.sax.SAXException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -46,7 +48,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	RadioButton albums;
 	RadioButton similar;
 
-    //Booleans to decide which API calls to use based on whats being searched, essentially using process of elimination to provide program flow
+    //Booleans to decide which API calls to use based on whats being searched, essentially using process of elimination to provide program flow.
+	//This likely isn't the best way to handle this, but it works for testing until a better flow is implemented
+
 	boolean tracks = false;
 	boolean topTracks = false;
 	boolean topArtists = false;
@@ -54,14 +58,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	ArrayAdapter<Item> artistAdapter;
 	ArrayList<Item> result;
 
-	final String M_KEY = "xxxxxxxxxxxxxxxxxx"; //redacted, because private
+	final String M_KEY = "b534d686e54b14b459a08e9ea83b0220"; //redacted, because private
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		//Session session = Authenticator.getMobileSession(user, password, M_KEY, secret);
 
 		box = (EditText) findViewById(R.id.bandTxt);
 		songs = (RadioButton) findViewById(R.id.topSongs);
@@ -82,9 +84,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		protected List<Item> doInBackground(URL... params) {
 			URL url = params[0];
-
+			result = null;
 			//Holy checked items and flag variables, Batman!
 			//Uses various xml handlers and flags to determine how to read the xml
+
 			if(songs.isChecked() && topArtists == false || topTracks == true){
 
 				try {
@@ -163,11 +166,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(List<Item> result) {
 			//Error messages just in case
+
 			if (result == null) {
-				Toast.makeText(getApplicationContext(), "Error",
-						Toast.LENGTH_LONG).show();
-				return;
-			} else if (result.size() == 0) {
 				Toast.makeText(getApplicationContext(), "No Content Found",
 						Toast.LENGTH_LONG).show();
 				return;
@@ -176,42 +176,46 @@ public class MainActivity extends Activity implements OnClickListener {
 			ListView lv;
 
 			//dialog if the user is searching, otherwise its top tracks
-			if(topTracks == false && topArtists == false){	
-				final Dialog dialog = new Dialog(MainActivity.this);
-				dialog.setContentView(R.layout.summarylayout);
-				dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-						WindowManager.LayoutParams.MATCH_PARENT);
 
-				lv = (ListView) dialog.findViewById(R.id.itemList);
+			if(topTracks == false && topArtists == false){
 
-				artistAdapter = new ArrayAdapter<Item>(getApplicationContext(),
-						android.R.layout.simple_list_item_1,
-						result.toArray(new Item[] {}));
 
-				lv.setAdapter(artistAdapter);
+					final Dialog dialog = new Dialog(MainActivity.this);
+					dialog.setContentView(R.layout.summarylayout);
+					dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+							WindowManager.LayoutParams.MATCH_PARENT);
 
-				lv.setOnItemClickListener(new MyOIListener());
+					lv = (ListView) dialog.findViewById(R.id.itemList);
 
-				Button closeButton = (Button) dialog
-						.findViewById(R.id.closeBtn);
-				// if button is clicked, close the custom dialog
-				closeButton.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						tracks = false;
-						dialog.dismiss();
+					artistAdapter = new ArrayAdapter<Item>(getApplicationContext(),
+							android.R.layout.simple_list_item_1,
+							result.toArray(new Item[]{}));
+
+					lv.setAdapter(artistAdapter);
+
+					lv.setOnItemClickListener(new MyOIListener());
+
+					Button closeButton = (Button) dialog
+							.findViewById(R.id.closeBtn);
+					// if button is clicked, close the custom dialog
+					closeButton.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							tracks = false;
+							dialog.dismiss();
+						}
+					});
+
+					//Setting the Dialog title text depending on user choices
+					if (similar.isChecked()) {
+						dialog.setTitle("Similar Artists");
+					} else if (songs.isChecked()) {
+						dialog.setTitle("Top Tracks");
+					} else {
+						dialog.setTitle("Top Albums");
 					}
-				});
+					dialog.show();
 
-
-				if(similar.isChecked()){
-					dialog.setTitle("Similar Artists");
-				}else if(songs.isChecked()){
-					dialog.setTitle("Top Tracks");
-				}else{
-					dialog.setTitle("Top Albums");
-				}
-				dialog.show();
 			}else{
 
 				//If the user isnt looking at top artist/tracks, it doesn't pull up the dialog
@@ -244,13 +248,13 @@ public class MainActivity extends Activity implements OnClickListener {
 			//If the user is looking at top tracks, searches youtube instead of redirecting to the last.fm page
 			if(tracks == false && topTracks == false){
 				if (topArtists == false){
-					uri = Uri.parse(item.getUrl());
+						uri = Uri.parse(item.getUrl());
 
-					Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-					startActivity(intent);
+						Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+						startActivity(intent);
 				}else if (topArtists == true){
 					//For some reason the urls from the similar artist xml dont have "http://" at the beginning, so the handler adds it
-					//Unfortunately this means theres an extra when its from the top tracks xml, so this removes it.
+					//Unfortunately this means theres an extra when its from the top tracks xml, so this removes it. (Example: http://http://sitename.com becomes http://sitename.com
 					//Weird, but it works.
 
 					artistUrl = artistUrl.replace("http://", "");
@@ -265,11 +269,16 @@ public class MainActivity extends Activity implements OnClickListener {
 				// there wouldnt be a band name in the text box if they looked at top artists, so it just searches the song name.
 
 				if(topTracks == false){
-					Intent intent = new Intent(Intent.ACTION_SEARCH);
-					intent.setPackage("com.google.android.youtube");
-					intent.putExtra("query", band + " " + item.getTitle());
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					startActivity(intent);
+
+					//try {
+						Intent intent = new Intent(Intent.ACTION_SEARCH);
+						intent.setPackage("com.google.android.youtube");
+						intent.putExtra("query", band + " " + item.getTitle());
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						startActivity(intent);
+					//}catch(){
+
+					//}
 				}else if(topTracks == true){
 					Intent intent = new Intent(Intent.ACTION_SEARCH);
 					intent.setPackage("com.google.android.youtube");
