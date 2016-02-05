@@ -49,7 +49,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	RadioButton similar;
 
     //Booleans to decide which API calls to use based on whats being searched, essentially using process of elimination to provide program flow.
-	//This likely isn't the best way to handle this, but it works for testing until a better flow is implemented
+	//Yes, it is terrible. It isn't the best way to handle this, but it works for testing until a better flow is implemented
+	//topArtists is used for both similar artists and top artists
 
 	boolean tracks = false;
 	boolean topTracks = false;
@@ -58,7 +59,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	ArrayAdapter<Item> artistAdapter;
 	ArrayList<Item> result;
 
-	final String M_KEY = "b534d686e54b14b459a08e9ea83b0220"; //redacted, because private
+	final String M_KEY = "b534d686e54b14b459a08e9ea83b0220";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -219,6 +220,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}else{
 
 				//If the user isnt looking at top artist/tracks, it doesn't pull up the dialog
+
 				lv = (ListView) findViewById(R.id.topListView);
 
 				artistAdapter = new ArrayAdapter<Item>(getApplicationContext(),
@@ -246,16 +248,25 @@ public class MainActivity extends Activity implements OnClickListener {
 			Uri uri;
 
 			//If the user is looking at top tracks, searches youtube instead of redirecting to the last.fm page
+
+			//For some reason the urls from the similar artist xml dont have correct http format in the URL, so the handler adds it
+			//Unfortunately this means theres an extra when its from the top tracks xml, so this removes it. (Example: http://http://sitename.com becomes http://sitename.com)
+			//Weird, but it works.
+
 			if(tracks == false && topTracks == false){
 				if (topArtists == false){
-						uri = Uri.parse(item.getUrl());
 
-						Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-						startActivity(intent);
+					artistUrl = artistUrl.replace("http://", "");
+					artistUrl = artistUrl.replace("http//", "");
+					artistUrl = "http://" + artistUrl;
+
+					uri = Uri.parse(artistUrl);
+
+					Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+					startActivity(intent);
+
 				}else if (topArtists == true){
-					//For some reason the urls from the similar artist xml dont have "http://" at the beginning, so the handler adds it
-					//Unfortunately this means theres an extra when its from the top tracks xml, so this removes it. (Example: http://http://sitename.com becomes http://sitename.com
-					//Weird, but it works.
+
 
 					artistUrl = artistUrl.replace("http://", "");
 					artistUrl = "http://" + artistUrl;

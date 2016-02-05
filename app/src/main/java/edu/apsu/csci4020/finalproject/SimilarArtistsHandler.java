@@ -18,7 +18,6 @@ public class SimilarArtistsHandler extends DefaultHandler {
     boolean inLink = false;
     StringBuilder titleBuffer;
     StringBuilder urlBuffer;
-    StringBuilder sumBuffer;
     ArrayList<Item> finalResult;
     Item currentArtist;
 

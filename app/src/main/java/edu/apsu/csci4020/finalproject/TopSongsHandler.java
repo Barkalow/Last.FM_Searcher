@@ -21,7 +21,6 @@ public class TopSongsHandler extends DefaultHandler {
     int urls = 1;
     StringBuilder titleBuffer;
     StringBuilder urlBuffer;
-    StringBuilder sumBuffer;
     ArrayList<Item> finalResult;
     Item currentItem;
 
